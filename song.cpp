@@ -117,48 +117,41 @@ void Playlist::PrintN(int n){
 
 void Song::Deserialize(istringstream& stream) {
     string token;
-    if (!getline(stream, token, ',')) // ignore id
-        throw runtime_error("Error: missing id");
+    getline(stream, token, ','); // ignore id
 
-    if (!getline(stream, this->name, ','))
-        throw runtime_error("Error: missing name");
+    getline(stream, this->name, ',');
 
-    if (!getline(stream, this->album, ','))
-        throw runtime_error("Error: missing album");
+    getline(stream, this->album, ',');
 
-    if (!getline(stream, token, ',')) // ignore album id
-        throw runtime_error("Error: missing album id");
+    getline(stream, token, ','); // ignore album id
 
-    if (!getline(stream, token, ','))
-        throw runtime_error("Error: missing artist");
+    getline(stream, token, ',');
     try{
-        token.erase(0, 2);
-        token.erase(token.size() - 2, 2);
+        while (token[0] == '\'' || token[0] == '[' || token[0] == '\"')
+            token.erase(0, 1);
+        while (token[token.size() - 1] == '\'' || token[token.size() - 1] == ']' || token[token.size() - 1] =='\"')
+            token.erase(token.size() - 1, 1);
         this->artist = token;
     }
     catch (out_of_range&){
         this->artist = "null";
     }
-    if (!getline(stream, token, ',')) // ignore artist id
-        throw runtime_error("Error: missing artist id");
+    getline(stream, token, ','); // ignore artist id
 
-    if (!getline(stream, token, ',')) // ignore track num
-        throw runtime_error("Error: missing track num");
+    getline(stream, token, ','); // ignore track num
 
-    if (!getline(stream, token, ',')) // ignore disk num
-        throw runtime_error("Error: missing disk num");
+    getline(stream, token, ','); // ignore disk num
 
-    if (!getline(stream, token, ','))
-        throw runtime_error("Error: missing explicit"); // explicit
+    getline(stream, token, ',');
 
-    if (token == "TRUE")
+    if (token.size() == 4){
         this->exp = true;
+    }
     else
         this->exp = false;
 
-    if (!getline(stream, token, ',')){
-        throw runtime_error("Error: missing decidability");
-    }
+    getline(stream, token, ',');
+
     try{
         this->dance = int(stod(token) * 100);
     }
@@ -166,8 +159,8 @@ void Song::Deserialize(istringstream& stream) {
         this->dance = 0;
     }
 
-    if (!getline(stream, token, ',')) // ignore artist id
-        throw runtime_error("Error: missing energy");
+    getline(stream, token, ','); // ignore artist id
+
     try{
         this->energy = int(stod(token) * 100);
     }
@@ -175,8 +168,8 @@ void Song::Deserialize(istringstream& stream) {
         this->energy = 0;
     }
 
-    if (!getline(stream, token, ','))
-        throw runtime_error("Error: missing artist id");
+    getline(stream, token, ',');
+
     try{
         this->key = stoi(token);
     }
@@ -184,33 +177,34 @@ void Song::Deserialize(istringstream& stream) {
         this->key = 0;
     }
 
-    if (!getline(stream, token, ','))
-        throw runtime_error("no loud");
+    getline(stream, token, ',');
+
     try{
-        this->loud = int(stod(token) * 100);
+        this->loud = stoi(token);
     }
     catch (invalid_argument&){
         this->loud = 0;
     }
 
-    if (!getline(stream, token, ','))
-        throw runtime_error("Error: missing mode"); // ignore mode
+    getline(stream, token, ',');
+    try{
+        this->mode = stoi(token);
+    }
+    catch (invalid_argument&){
+        this->mode = -1;
+    }
 
-    if (!getline(stream, token, ','))
-        throw runtime_error("Error: missing speech"); // ignore speece
+    getline(stream, token, ',');
+    // ignore speece
 
-    if (!getline(stream, token, ','))
-        throw runtime_error("Error: missing acoustics");
+    getline(stream, token, ',');
 
+    getline(stream, token, ',');
 
-    if (!getline(stream, token, ','))
-        throw runtime_error("Error: missing instrumental");
+    getline(stream, token, ',');
 
-    if (!getline(stream, token, ','))
-        throw runtime_error("Error: missing liveliness");
+    getline(stream, token, ',');
 
-    if (!getline(stream, token, ','))
-        throw runtime_error("Error: missing valence");
     try{
         this->valence = int(stod(token) * 100);
     }
@@ -218,8 +212,7 @@ void Song::Deserialize(istringstream& stream) {
         this->valence = 0;
     }
 
-    if (!getline(stream, token, ','))
-        throw runtime_error("Error: missing tempo");
+    getline(stream, token, ',');
     try{
         this->tempo = stoi(token);
     }
@@ -228,14 +221,12 @@ void Song::Deserialize(istringstream& stream) {
     }
 
 
-    if (!getline(stream, token, ','))
-        throw runtime_error("Error: missing duration"); // ignore duration
+    getline(stream, token, ',');
+    // ignore duration
 
-    if (!getline(stream, token, ','))
-        throw runtime_error("Error: missing time signature");
+    getline(stream, token, ',');
 
-    if (!getline(stream, token, ','))
-        throw runtime_error("Error: missing year");
+    getline(stream, token, ',');
     try{
         this->year = stoi(token);
     }
@@ -243,8 +234,7 @@ void Song::Deserialize(istringstream& stream) {
         this->year = 0;
     }
 
-    if (!getline(stream, token, ','))
-        throw runtime_error("Error: missing release date");
+    getline(stream, token, ',');
 }
 
 Playlist::~Playlist(){
