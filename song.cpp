@@ -113,7 +113,7 @@ void Playlist::PrintN(int n){
     else{
         cout << "Your playlist has " << n << " songs!" << endl;
 
-        for (int i = n - 1; i > 0; i--){
+        for (int i = songs.size() - 1; i > songs.size() - n - 1; i--){
             cout << "Title: " << songs[i]->name << endl;
             cout << "Artist: " << songs[i]->artist << endl;
             cout << "Album: " << songs[i]->album << endl << endl;
