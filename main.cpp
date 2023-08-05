@@ -7,52 +7,77 @@
 #include <string>
 using namespace std;
 
+// This is just a helper function to swap 2 values in the vector when using the insertion sort algorithm
 void swap(vector<Song*> &songs, float j, float j_incr) {
     Song* temp = songs[j];
     songs[j] = songs[j_incr];
     songs[j_incr] = temp;
 }
 
+// InsertionSort, modified to apply to ShellSort's algorithm
+// Used the template from the online textbook
 void InsertionSort(vector<Song*> &songs, int start, int incr, int n) {
     for (int i = start+incr; i < n; i += incr)
         for (int j = i; ((j >= incr) && (songs[j]->rating < songs[j-incr]->rating)); j -= incr)
             swap(songs, j, j-incr);
 }
 
+// ShellSort, used template from online textbook for class
+// Made to take in a vector of int,float or double
+// IMPORTANT this ShellSort doesn't return a value but takes in a reference to a vector<T> and will save the changes made to the vector
+// I had to make the function take in a reference because of the way the algorithm works, yes there is possibly a way to return a value however, upon returning a value, it will break out of any loop its currently in which is not what we want
 void ShellSort(vector<Song*> &songs, int n) {
+    // Will pass in powers of 2 for the increment down to 2
     for (int i = n/2; i > 2; i /= 2)  // For each increment
         for (int j = 0; j < i; j++)  // Sort each sublist
             InsertionSort(songs, j, i, n);
-    InsertionSort(songs, 0, 1, n);
+    InsertionSort(songs, 0, 1, n);    
+    // Does normal insertion sort with 1 as the increment to compare all the values in the vector and swap them if need be
+
 }
 
+// MergeSort, used template from online textbook for class.
+// Made to take in a vector of int,float or double
+// Is called in the MergeSort function to break the lists down into smalled vectors until you have only <= 1 numbers in each vector to compare
 vector<Song*> Merge(vector<Song*> songs1, vector<Song*> songs2) {
+    // Declaring new vector of type T to combine the 2 sub vectors in sorted order
     vector<Song*> sorted;
+    // Declaring some ints to help keep track of the size and positions of each of the indexes for the vectors as they traverse along them
     int count1 = 0;
     int count2 = 0;
     int size1 = songs1.size();
     int size2 = songs2.size();
+    // Will iterate over the vectors until it has compared all the elements within them
     while (count1 < size1 || count2 < size2) {
+        // Adds the numbers in the second list if the first list doesn't have any numbers left to compare
         if (count1 == size1) {
             sorted.push_back(songs2[count2]);
             count2++;
         }
+        // Adds the numbers in the first list if the second list doesn't have any numbers left to compare
         else if (count2 == size2) {
             sorted.push_back(songs1[count1]);
             count1++;
         }
+        // Comparing two numbers
         else if (songs1[count1]->rating <= songs2[count2]->rating) {
             sorted.push_back(songs1[count1++]);
         }
+        // The opposite of the above if statement is false
         else
             sorted.push_back(songs2[count2++]);
     }
     return sorted;
 }
 
+// MergeSort
+// Made to take in a vector of int,float or double
+// IMPORTANT to note that the MergeSort here returns a data type(vector<T>) with T being any data type that was passed in
 vector<Song*> MergeSort(vector<Song*> inlist) {
+    // If there is only <= 1 elements in the list then return the list as it is already sorted
     if (inlist.size() <= 1)
         return inlist;
+    // Declaring two new sub vectors one with the first half and the other with the second half until
     vector<Song*> list1;
     vector<Song*> list2;
     for (int i = 0; i < inlist.size(); i++) {
@@ -61,14 +86,17 @@ vector<Song*> MergeSort(vector<Song*> inlist) {
         else
             list2.push_back(inlist[i]);
     }
+    // Recursive call to MergeSort until both of the new vectors are of size <= 1
     return Merge(MergeSort(list1), MergeSort(list2));
 }
 
+// For Printing Out The Sorted Lists
 void PrintList(vector<Song*> list, int size) {
     for (int i = 0; i < size; i++)
         cout << fixed << setprecision(5) << list[i]->rating << " ";
 }
 
+// Function to read all the inputs from the CSV file with the constraints from the user
 void ReadCSV(Playlist& p, const string& opt, const string& adj, bool exp, int year, const string& artist){
     ifstream inFile;
     inFile.open("tracks_features.csv");
@@ -84,6 +112,7 @@ void ReadCSV(Playlist& p, const string& opt, const string& adj, bool exp, int ye
     }
 }
 
+// Checks to see if a string is valid, only alpha or spaces allowed
 bool check_string(const string& str) {
     for (char i : str) {
         if (isalpha(i)) {
@@ -98,6 +127,7 @@ bool check_string(const string& str) {
     return true;
 }
 
+// Check to see if a number
 bool check_num_str(const string& str, int num) {
     if (str == "all") {
         return true;
@@ -175,6 +205,7 @@ bool check_num_str(const string& str, int num) {
     }
     return true;
 }
+
 
 int main() {
     Playlist p;
