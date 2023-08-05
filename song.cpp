@@ -110,17 +110,16 @@ void Playlist::PrintN(int n){
             cout << "Album: " << songs[i]->album << endl << endl;
         }
     }
+        
+    // n is less than size
     else{
         cout << "Your playlist has " << n << " songs!" << endl;
-
-        for (int i = n - 1; i > 0; i--){
+        for (int i = songs.size() - 1; i > songs.size() - 1 - n; i--){
             cout << "Title: " << songs[i]->name << endl;
             cout << "Artist: " << songs[i]->artist << endl;
             cout << "Album: " << songs[i]->album << endl << endl;
-
         }
     }
-
 }
 
 void Song::Deserialize(istringstream& stream) {
@@ -158,18 +157,28 @@ void Song::Deserialize(istringstream& stream) {
     getline(stream, artist, ','); // get artist
     if (artist[0] == '\"'){
         artist.erase(0, 1);
+        while(artist[artist.size() - 1] == '\'')
+            artist.erase(artist.size() - 1,1);
         while (artist[artist.size() - 1] != '\"'){
             getline(stream, token, ',');
             if (token[token.size() - 2] == ']')
                 break;
+            while(token[0] == '\'')
+                token.erase(0,1);
+            while(token[1] == '\'')
+                token.erase(1,1);
+            while(token[token.size() - 1] == '\'')
+                token.erase(token.size() - 1,1);
             artist += "," + token;
         }
     }
+
     while (artist[0] == '\'' || artist[0] == '\"' || artist[0] == '[')
         artist.erase(0, 1);
     while (artist[artist.size() - 1] == '\'' || artist[artist.size() - 1] == '\"' || artist[artist.size() - 1] == ']')
         artist.erase(artist.size() - 1, 1);
 
+    cout << artist;
     getline(stream, token, ','); // ignore artist id
 
     getline(stream, token, ','); // ignore track num
